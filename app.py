@@ -134,8 +134,6 @@ def register():
         password = request.form['password']
         db = connect_db()
         c = db.cursor()
-        #pass_statement = """SELECT * FROM users WHERE password = '%s';""" %password
-        #user_statement = """SELECT * FROM users WHERE username = '%s';""" %username
         c.execute("SELECT * FROM users WHERE password = ?;", (password,))
         if(len(c.fetchall())>0):
             errored = True
@@ -147,9 +145,6 @@ def register():
             usererror = "That username is already in use by someone else!"
 
         if(not errored):
-            #statement = """INSERT INTO users(id,username,password) VALUES(null,'%s','%s');""" %(username,password)
-            #print(statement)
-            #c.execute(statement)
             c.execute("INSERT INTO users(id,username,password) VALUES(null,?1,?2);", (username, password))
             db.commit()
             db.close()
