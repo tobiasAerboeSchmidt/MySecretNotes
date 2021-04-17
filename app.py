@@ -4,6 +4,7 @@ from flask import Flask, current_app, g, session, redirect, render_template, url
 
 
 
+
 ### DATABASE FUNCTIONS ###
 
 def connect_db():
@@ -17,6 +18,7 @@ def init_db():
 
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS notes;
+DROP TABLE IF EXISTS fb_users;
 
 CREATE TABLE notes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -27,6 +29,12 @@ CREATE TABLE notes (
 );
 
 CREATE TABLE users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL,
+    password TEXT NOT NULL
+);
+
+CREATE TABLE fb_users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT NOT NULL,
     password TEXT NOT NULL
@@ -159,9 +167,25 @@ def register():
         db.close()
     return render_template('register.html',usererror=usererror,passworderror=passworderror)
 
-@app.route("/fb/")
+@app.route("/fb/", methods=('GET', 'POST'))
 def fb():
-    return render_template('fb.html')
+    error = ""
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        db = connect_db()
+        c = db.cursor()
+        statement = "SELECT * FROM fb_users WHERE username = '%s' AND password = '%s';" %(username, password)
+        c.execute(statement)
+        result = c.fetchall()
+
+        if len(result) > 0:
+            error = result
+            print(result)
+        else:
+            error = "Wrong username or password!"
+        
+    return render_template('fb.html', error=error)
 
 @app.route("/logout/")
 @login_required
