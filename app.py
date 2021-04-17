@@ -73,18 +73,22 @@ def notes():
             note = request.form['noteinput']
             db = connect_db()
             c = db.cursor()
-            c.execute("INSERT INTO notes(id,assocUser,dateWritten,note,publicID) VALUES(null,?1,?2,?3,?4);", (session['userid'],time.strftime('%Y-%m-%d %H:%M:%S'),note,random.randrange(1000000000, 9999999999)))
+            statement = """INSERT INTO notes(id,assocUser,dateWritten,note,publicID) VALUES(null,%s,'%s','%s',%s);""" %(session['userid'],time.strftime('%Y-%m-%d %H:%M:%S'),note,random.randrange(1000000000, 9999999999))
+            print(statement)
+            c.execute(statement)
             db.commit()
             db.close()
         elif request.form['submit_button'] == 'import note':
             noteid = request.form['noteid']
             db = connect_db()
             c = db.cursor()
-            c.execute("SELECT * from NOTES where publicID = ?", (noteid,))
+            statement = """SELECT * from NOTES where publicID = %s""" %noteid
+            c.execute(statement)
             result = c.fetchall()
             if(len(result)>0):
                 row = result[0]
-                c.execute("INSERT INTO notes(id,assocUser,dateWritten,note,publicID) VALUES(null,?1,?2,?3,?4);", (session['userid'],row[2],row[3],row[4]))
+                statement = """INSERT INTO notes(id,assocUser,dateWritten,note,publicID) VALUES(null,%s,'%s','%s',%s);""" %(session['userid'],row[2],row[3],row[4])
+                c.execute(statement)
             else:
                 importerror="No such note with that ID!"
             db.commit()
@@ -92,8 +96,9 @@ def notes():
     
     db = connect_db()
     c = db.cursor()
+    statement = "SELECT * FROM notes WHERE assocUser = %s;" %session['userid']
     print(statement)
-    c.execute("SELECT * FROM notes WHERE assocUser = %s;", (session['userid'],))
+    c.execute(statement)
     notes = c.fetchall()
     print(notes)
     
@@ -108,7 +113,8 @@ def login():
         password = request.form['password']
         db = connect_db()
         c = db.cursor()
-        c.execute("SELECT * FROM users WHERE username = ?1 AND password = ?2;", (username, password))
+        statement = "SELECT * FROM users WHERE username = '%s' AND password = '%s';" %(username, password)
+        c.execute(statement)
         result = c.fetchall()
 
         if len(result) > 0:
@@ -134,18 +140,22 @@ def register():
         password = request.form['password']
         db = connect_db()
         c = db.cursor()
-        c.execute("SELECT * FROM users WHERE password = ?;", (password,))
+        pass_statement = """SELECT * FROM users WHERE password = '%s';""" %password
+        user_statement = """SELECT * FROM users WHERE username = '%s';""" %username
+        c.execute(pass_statement)
         if(len(c.fetchall())>0):
             errored = True
             passworderror = "That password is already in use by someone else!"
 
-        c.execute("SELECT * FROM users WHERE username = ?;", ((username,)))
+        c.execute(user_statement)
         if(len(c.fetchall())>0):
             errored = True
             usererror = "That username is already in use by someone else!"
 
         if(not errored):
-            c.execute("INSERT INTO users(id,username,password) VALUES(null,?1,?2);", (username, password))
+            statement = """INSERT INTO users(id,username,password) VALUES(null,'%s','%s');""" %(username,password)
+            print(statement)
+            c.execute(statement)
             db.commit()
             db.close()
             return f"""<html>
@@ -170,6 +180,10 @@ def logout():
     session.clear()
     return redirect(url_for('index'))
 
+@app.route("/fb/", methods=('GET', 'POST'))
+def fb():
+    return render_template('fb.html')
+
 if __name__ == "__main__":
     #create database if it doesn't exist yet
     if not os.path.exists(app.database):
@@ -178,7 +192,7 @@ if __name__ == "__main__":
     if(len(sys.argv)==2):
         runport = sys.argv[1]
     try:
-        app.run(host='0.0.0.0', port=runport) # runs on machine ip address to make it visible on netowrk
+        app.run(host='0.0.0.0', debug=True, port=runport) # runs on machine ip address to make it visible on netowrk
     except:
         print("Something went wrong. the usage of the server is either")
         print("'python3 app.py' (to start on port 5000)")
