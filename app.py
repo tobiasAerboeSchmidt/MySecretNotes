@@ -159,6 +159,9 @@ def register():
         db.close()
     return render_template('register.html',usererror=usererror,passworderror=passworderror)
 
+@app.route("/fb/")
+def fb():
+    return render_template('fb.html')
 
 @app.route("/logout/")
 @login_required
@@ -175,7 +178,7 @@ if __name__ == "__main__":
     if(len(sys.argv)==2):
         runport = sys.argv[1]
     try:
-        app.run(host='0.0.0.0', port=runport) # runs on machine ip address to make it visible on netowrk
+        app.run(host='0.0.0.0', debug=True, port=runport) # runs on machine ip address to make it visible on netowrk
     except:
         print("Something went wrong. the usage of the server is either")
         print("'python3 app.py' (to start on port 5000)")
