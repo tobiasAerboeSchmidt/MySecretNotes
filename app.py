@@ -96,11 +96,8 @@ def notes():
     
     db = connect_db()
     c = db.cursor()
-    statement = "SELECT * FROM notes WHERE assocUser = %s;" %session['userid']
-    print(statement)
-    c.execute(statement)
+    c.execute("SELECT * FROM notes WHERE assocUser = ?;", (session['userid'],))
     notes = c.fetchall()
-    print(notes)
     
     return render_template('notes.html',notes=notes,importerror=importerror)
 
