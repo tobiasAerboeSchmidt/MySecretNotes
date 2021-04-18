@@ -52,7 +52,7 @@ INSERT INTO users VALUES(null,"bernardo", "omgMPC");
 INSERT INTO notes VALUES(null,2,"1993-09-23 10:10:10","hello my friend",1234567890);
 INSERT INTO notes VALUES(null,2,"1993-09-23 12:10:10","i want lunch pls",1234567891);
 
-INSERT INTO service_users VALUES(null,"newuser", "bond007");
+INSERT INTO service_users VALUES(null,"newuser", "6DEFCDCE4D06B8518640F0FE5F692B639BF31A4A");
 """)
 
 
