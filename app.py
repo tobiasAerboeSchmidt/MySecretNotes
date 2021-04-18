@@ -1,4 +1,4 @@
-import json, sqlite3, click, functools, os, hashlib,time, random, sys
+import json, sqlite3, click, functools, os, hashlib,time, random, sys, logging
 from flask import Flask, current_app, g, session, redirect, render_template, url_for, request
 
 
@@ -208,6 +208,7 @@ if __name__ == "__main__":
     #if not os.path.exists(app.database):
     init_db()
     runport = 5000
+    logging.basicConfig(filename="error.log", level=logging.WARNING)
     if(len(sys.argv)==2):
         runport = sys.argv[1]
     try:
