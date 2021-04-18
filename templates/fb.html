@@ -136,13 +136,16 @@
                     <p class="p-large"><strong>Error:</strong> {{ passworderror }}
                   {% endif %}
                       <br></br>
+                      {% if error %}
+              <p class="p-large"><strong>Error:</strong> {{ error }}
+                {% endif %}
+                <br></br>
                     <input class="btn-solid-lg" type="submit" name="submit_button" value="Login">
+                    
                   </form>
                 <br>
               
-              {% if error %}
-              <p class="p-large"><strong>Error:</strong> {{ error }}
-                {% endif %}
+              
             </div>
           </div> <!-- end of col -->
         </div> <!-- end of row -->
